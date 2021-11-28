@@ -7,3 +7,5 @@ description = "run cargo commands on a matrix of feature sets"
 license = "MIT"
 
 [dependencies]
+derive_more = "0.99.17"
+serde = { version = "1.0.130", features = ["derive"] }
