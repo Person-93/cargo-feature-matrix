@@ -1,6 +1,12 @@
 use crate::features::{FeatureMatrix, FeatureSet};
+use figment::{
+    value::{Dict, Map},
+    Error, Figment, Metadata, Profile, Provider,
+};
+use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, num::NonZeroU8};
 
+#[derive(Default, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct Config {
     /// If this set is not empty, only these features will be used to construct the
@@ -37,8 +43,28 @@ pub struct Config {
 /// Each set in the matrix must include `count` members in `set`. Any generated
 /// features set that does not meet this requirement will be dropped from the
 /// matrix.
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Choose {
     pub count: NonZeroU8,
     pub set: FeatureSet,
+}
+
+impl Config {
+    pub fn from<T: Provider>(provider: T) -> Result<Config, Error> {
+        Figment::from(provider).extract()
+    }
+
+    pub fn figment() -> Figment {
+        Figment::from(Config::default())
+    }
+}
+
+impl Provider for Config {
+    fn metadata(&self) -> Metadata {
+        Metadata::named("Config object")
+    }
+
+    fn data(&self) -> Result<Map<Profile, Dict>, Error> {
+        figment::providers::Serialized::defaults(self).data()
+    }
 }
