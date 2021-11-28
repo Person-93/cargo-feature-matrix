@@ -7,13 +7,14 @@ use std::{
 };
 
 #[derive(
-    Clone, Debug, Deref, DerefMut, AsRef, AsMut, Serialize, Deserialize,
+    Clone, Debug, Default, Deref, DerefMut, AsRef, AsMut, Serialize, Deserialize,
 )]
 pub struct FeatureMatrix(HashSet<FeatureSet>);
 
 #[derive(
     Clone,
     Debug,
+    Default,
     Eq,
     PartialEq,
     Hash,
