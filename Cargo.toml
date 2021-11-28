@@ -1,0 +1,9 @@
+[package]
+name = "cargo-feature-matrix"
+authors = ["person93 <person93.person93@gmail.com>"]
+version = "0.1.0-dev"
+edition = "2021"
+description = "run cargo commands on a matrix of feature sets"
+license = "MIT"
+
+[dependencies]

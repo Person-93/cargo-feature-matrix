@@ -1,0 +1,6 @@
+allow-branch = ["master"]
+dev-version-ext = "dev"
+pre-release-commit-message = "chore: release {{version}}"
+post-release-commit-message = "chore: version bump {{next_version}}"
+consolidate-commits = true
+consolidate-pushes = true
