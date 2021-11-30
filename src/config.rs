@@ -4,7 +4,7 @@ use figment::{
     Error, Figment, Metadata, Profile, Provider,
 };
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, num::NonZeroU8};
+use std::collections::HashSet;
 
 #[derive(Default, Serialize, Deserialize)]
 #[non_exhaustive]
@@ -35,18 +35,6 @@ pub struct Config {
     /// List sets of features that can't be used together. Any generated feature
     /// set that is a superset of any of these sets will be dropped from the matrix.
     pub conflict: HashSet<FeatureSet>,
-
-    /// See [`Choose`].
-    pub choose: HashSet<Choose>,
-}
-
-/// Each set in the matrix must include `count` members in `set`. Any generated
-/// features set that does not meet this requirement will be dropped from the
-/// matrix.
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
-pub struct Choose {
-    pub count: NonZeroU8,
-    pub set: FeatureSet,
 }
 
 impl Config {
