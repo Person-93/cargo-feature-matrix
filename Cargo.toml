@@ -7,6 +7,7 @@ description = "run cargo commands on a matrix of feature sets"
 license = "MIT"
 
 [dependencies]
+cargo_metadata = "0.14.1"
 clap = { version = "3.0.0-beta.5", features = ["wrap_help"] }
 derive_more = "0.99.17"
 figment = "0.10.6"
