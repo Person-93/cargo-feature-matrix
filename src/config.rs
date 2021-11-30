@@ -28,9 +28,9 @@ pub struct Config {
     pub skip: FeatureMatrix,
 
     /// Some crates prepend internal features with a double underscore. If this
-    /// flag is set, those features will not be used to build the matrix, but
+    /// flag is not set, those features will not be used to build the matrix, but
     /// will be allowed if they are enabled by other features.
-    pub exclude_double_underscore: bool,
+    pub include_hidden: bool,
 
     /// List sets of features that can't be used together. Any generated feature
     /// set that is a superset of any of these sets will be dropped from the matrix.
