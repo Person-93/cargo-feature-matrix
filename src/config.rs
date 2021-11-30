@@ -11,7 +11,7 @@ use std::{collections::HashSet, num::NonZeroU8};
 pub struct Config {
     /// If this set is not empty, only these features will be used to construct the
     /// matrix.
-    pub allow: FeatureSet,
+    pub seed: FeatureSet,
 
     /// All of these features will be included in every feature set in the matrix.
     pub include: FeatureSet,
