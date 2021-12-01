@@ -1,20 +1,119 @@
+use crate::Config;
+use cargo_metadata::Package;
 use derive_more::{AsMut, AsRef, Deref, DerefMut};
+use itertools::Itertools;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{Display, Formatter},
     ops::Deref,
 };
+use thiserror::Error;
 
 #[derive(
     Clone, Debug, Default, Deref, DerefMut, AsRef, AsMut, Serialize, Deserialize,
 )]
 pub struct FeatureMatrix<'f>(#[serde(borrow)] HashSet<FeatureSet<'f>>);
 
+impl<'f> FeatureMatrix<'f> {
+    pub(crate) fn new(
+        package: &'f Package,
+        config: &'f Config<'f>,
+    ) -> Result<Self, MissingFeature> {
+        let mut include = config.include.clone();
+        include.add_transitive_features(package)?;
+        let include = include;
+
+        extract_seed(package, config)
+            .into_iter()
+            .powerset()
+            .map(FeatureSet::from_iter)
+            .map(|mut set| -> Result<_, MissingFeature> {
+                set.extend(include.clone());
+                set.add_transitive_features(package)?;
+                Ok(set)
+            })
+            .filter_ok(|set| set.is_disjoint(&config.deny))
+            .filter_ok(|set| !config.skip.iter().any(|skip| skip == set))
+            .filter_ok(|set| {
+                !config
+                    .conflict
+                    .iter()
+                    .any(|conflict| set.is_superset(conflict))
+            })
+            .collect()
+    }
+}
+
+/// Reads the package + config and outputs the set of features that should be used to
+/// seed the matrix.
+fn extract_seed<'f>(
+    package: &'f Package,
+    config: &'f Config<'f>,
+) -> FeatureSet<'f> {
+    if !config.seed.is_empty() {
+        config.seed.clone()
+    } else {
+        package
+            .features
+            .keys()
+            .map(|feature| Feature(feature))
+            // exclude default feature
+            .filter(|feature| feature.0 != "default")
+            // exclude deny list because they will all end up denied anyways
+            .filter(|package| !config.deny.iter().contains(package))
+            // exclude the include list because it'll be easier to just add them all at once
+            .filter(|package| !config.include.iter().contains(package))
+            // exclude hidden features by default
+            .filter(|feature| {
+                config.include_hidden || !feature.starts_with("__")
+            })
+            // add the optional dependencies to the list
+            .chain(
+                package
+                    .dependencies
+                    .iter()
+                    .filter_map(|dependency| {
+                        dependency.optional.then(|| {
+                            dependency
+                                .rename
+                                .as_deref()
+                                .unwrap_or(&dependency.name)
+                        })
+                    })
+                    .map(Feature),
+            )
+            .collect()
+    }
+}
+
 #[derive(
     Clone, Debug, Default, Eq, PartialEq, Hash, Deref, DerefMut, AsRef, AsMut,
 )]
 pub struct FeatureSet<'f>(BTreeSet<Feature<'f>>);
+
+impl<'f> FeatureSet<'f> {
+    fn add_transitive_features(
+        &mut self,
+        package: &'f Package,
+    ) -> Result<(), MissingFeature> {
+        let raw_features = &package.features;
+        let transitive = self
+            .iter()
+            .map(|feature| -> Result<_, _> {
+                Ok(raw_features
+                    .get(*feature.as_ref())
+                    .ok_or_else(|| MissingFeature(feature.to_string()))?
+                    .iter()
+                    .map(AsRef::<str>::as_ref))
+            })
+            .flatten_ok()
+            .map_ok(Feature)
+            .collect::<Result<Vec<_>, _>>()?;
+        self.extend(transitive);
+        Ok(())
+    }
+}
 
 #[derive(
     Clone,
@@ -126,3 +225,7 @@ impl Display for Feature<'_> {
         Display::fmt(&self.0, f)
     }
 }
+
+#[derive(Debug, Error)]
+#[error("feature `{}` not present in Cargo.toml", _0)]
+pub struct MissingFeature(String);
