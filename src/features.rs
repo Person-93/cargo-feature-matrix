@@ -43,6 +43,21 @@ impl Serialize for FeatureSet<'_> {
     }
 }
 
+impl<'f> FromIterator<FeatureSet<'f>> for FeatureMatrix<'f> {
+    fn from_iter<T: IntoIterator<Item = FeatureSet<'f>>>(iter: T) -> Self {
+        FeatureMatrix(iter.into_iter().collect())
+    }
+}
+
+impl<'f> IntoIterator for FeatureMatrix<'f> {
+    type Item = FeatureSet<'f>;
+    type IntoIter = <<Self as Deref>::Target as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl<'de: 'f, 'f> Deserialize<'de> for FeatureSet<'f> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -94,6 +109,15 @@ impl<'f> From<&'f str> for FeatureSet<'f> {
 impl<'f> FromIterator<Feature<'f>> for FeatureSet<'f> {
     fn from_iter<T: IntoIterator<Item = Feature<'f>>>(iter: T) -> Self {
         FeatureSet(iter.into_iter().collect())
+    }
+}
+
+impl<'f> IntoIterator for FeatureSet<'f> {
+    type Item = Feature<'f>;
+    type IntoIter = <<Self as Deref>::Target as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 
