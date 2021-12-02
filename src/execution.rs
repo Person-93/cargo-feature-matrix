@@ -1,7 +1,7 @@
 use crate::{features::FeatureMatrix, Error};
-use crossterm::style::Stylize;
 use lazy_static::lazy_static;
 use std::{env, ffi::OsString, io::Write, process::Command, process::Stdio};
+use yansi::Color::*;
 
 pub(crate) struct Task<'t> {
     matrix: FeatureMatrix<'t>,
@@ -71,16 +71,17 @@ impl<'t> Task<'t> {
 
             print!(
                 "{}{} {}{} {}{}{}......",
-                "running: cmd=".cyan(),
+                Cyan.paint("running: cmd="),
                 self.command,
-                "package=".cyan(),
+                Cyan.paint("package="),
                 self.package_name,
-                "features=[".cyan(),
+                Cyan.paint("features=["),
                 feature_set,
-                "]".cyan()
+                Cyan.paint("]")
             );
 
-            let on_success = || println!("{}", "OK".black().on_green());
+            let on_success =
+                || println!("{}", Black.style().bg(Green).paint("OK"));
 
             match cmd {
                 None => on_success(),
@@ -92,7 +93,7 @@ impl<'t> Task<'t> {
                     if output.status.success() {
                         on_success();
                     } else {
-                        println!("{}", "Fail".black().on_red());
+                        println!("{}", Black.style().bg(Red).paint("Fail"));
                         exit_status = Some(output.status);
                         std::io::stderr()
                             .write_all(&output.stderr)

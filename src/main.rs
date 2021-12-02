@@ -2,10 +2,11 @@ use anyhow::Result;
 use cargo_feature_matrix::{Config, TaskKind};
 use clap::{
     crate_authors, crate_description, crate_license, crate_name, crate_version,
-    AppSettings, Parser,
+    AppSettings, ArgEnum, Parser,
 };
 use itertools::Itertools;
 use std::{env, path::PathBuf};
+use yansi::Paint;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -25,6 +26,10 @@ struct Opts {
     #[clap(last = true)]
     args: Vec<String>,
 
+    /// Colorize output
+    #[clap(long, arg_enum, default_value = "auto")]
+    color: ColorChoice,
+
     /// Print a list of all the cargo commands one per line.
     ///
     /// This is intended to be consumed by external job runners.
@@ -40,6 +45,13 @@ struct Opts {
     manifest_path: Option<PathBuf>,
 }
 
+#[derive(Copy, Clone, Debug, ArgEnum)]
+enum ColorChoice {
+    Auto,
+    Always,
+    Never,
+}
+
 fn main() -> Result<()> {
     let mut args = env::args().collect_vec();
     if let Some(name) = args.get(1) {
@@ -50,11 +62,29 @@ fn main() -> Result<()> {
 
     let Opts {
         command,
+        color,
         args,
         print_jobs,
         dry_run,
         manifest_path,
     } = Opts::parse_from(args);
+
+    match color {
+        ColorChoice::Auto => {
+            #[cfg(windows)]
+            if !Paint::enable_windows_ascii() {
+                Paint::disable();
+            }
+
+            if env::var("TERM").map_or(true, |term| term == "dumb")
+                || atty::isnt(atty::Stream::Stdout)
+            {
+                Paint::disable();
+            }
+        }
+        ColorChoice::Always => {}
+        ColorChoice::Never => Paint::disable(),
+    }
 
     let task = if dry_run {
         TaskKind::DryRun
