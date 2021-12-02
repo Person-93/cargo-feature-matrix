@@ -4,7 +4,8 @@ use clap::{
     crate_authors, crate_description, crate_license, crate_name, crate_version,
     AppSettings, Parser,
 };
-use std::path::PathBuf;
+use itertools::Itertools;
+use std::{env, path::PathBuf};
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -40,13 +41,20 @@ struct Opts {
 }
 
 fn main() -> Result<()> {
+    let mut args = env::args().collect_vec();
+    if let Some(name) = args.get(1) {
+        if name == "feature-matrix" {
+            args.remove(1);
+        }
+    }
+
     let Opts {
         command,
         args,
         print_jobs,
         dry_run,
         manifest_path,
-    } = Opts::parse();
+    } = Opts::parse_from(args);
 
     let task = if dry_run {
         TaskKind::DryRun
