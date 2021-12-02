@@ -1,7 +1,7 @@
 use crate::{features::FeatureMatrix, Error};
+use crossterm::style::Stylize;
 use lazy_static::lazy_static;
 use std::{env, ffi::OsString, io::Write, process::Command, process::Stdio};
-use termion::color;
 
 pub(crate) struct Task<'t> {
     matrix: FeatureMatrix<'t>,
@@ -68,33 +68,17 @@ impl<'t> Task<'t> {
             };
 
             print!(
-                "{}running: cmd={}{}{} package={}{}{} features=[{}{}{}]{}......",
-                color::Fg(color::LightCyan),
-
-                color::Fg(color::Reset),
+                "{}{} {}{} {}{}{}......",
+                "running: cmd=".cyan(),
                 self.command,
-                color::Fg(color::LightCyan),
-
-                color::Fg(color::Reset),
+                "package=".cyan(),
                 self.package_name,
-                color::Fg(color::LightCyan),
-
-                color::Fg(color::Reset),
+                "features=[".cyan(),
                 feature_set,
-                color::Fg(color::LightCyan),
-
-                color::Fg(color::Reset),
+                "]".cyan()
             );
 
-            let on_success = || {
-                println!(
-                    "{}{}OK{}{}",
-                    color::Bg(color::LightGreen),
-                    color::Fg(color::Black),
-                    color::Bg(color::Reset),
-                    color::Fg(color::Reset)
-                )
-            };
+            let on_success = || println!("{}", "OK".black().on_green());
 
             match cmd {
                 None => on_success(),
@@ -106,13 +90,7 @@ impl<'t> Task<'t> {
                     if output.status.success() {
                         on_success();
                     } else {
-                        println!(
-                            "{}{}Fail{}{}",
-                            color::Bg(color::LightRed),
-                            color::Fg(color::Black),
-                            color::Bg(color::Reset),
-                            color::Fg(color::Reset)
-                        );
+                        println!("{}", "Fail".black().on_red());
                         exit_status = Some(output.status);
                         std::io::stderr()
                             .write_all(&output.stderr)
