@@ -12,7 +12,7 @@ atty = "0.2.14"
 cargo_metadata = "0.14.1"
 clap = { version = "=3.0.0-beta.5", features = ["wrap_help"] }
 derive_more = "0.99.17"
-figment = "0.10.6"
+figment = { version = "0.10.6", features = ["json"] }
 itertools = "0.10.1"
 lazy_static = "1.4.0"
 serde = { version = "1.0.130", features = ["derive"] }

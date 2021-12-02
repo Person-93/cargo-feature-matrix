@@ -232,6 +232,7 @@ checksum = "790b4292c72618abbab50f787a477014fe15634f96291de45672ce46afe122df"
 dependencies = [
  "atomic",
  "serde",
+ "serde_json",
  "uncased",
  "version_check",
 ]
