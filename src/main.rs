@@ -1,3 +1,5 @@
+use anyhow::Result;
+use cargo_feature_matrix::{Config, TaskKind};
 use clap::{
     crate_authors, crate_description, crate_license, crate_name, crate_version,
     AppSettings, Parser,
@@ -37,6 +39,30 @@ struct Opts {
     manifest_path: Option<PathBuf>,
 }
 
-fn main() {
-    println!("{:#?}", Opts::parse());
+fn main() -> Result<()> {
+    let Opts {
+        command,
+        args,
+        print_jobs,
+        dry_run,
+        manifest_path,
+    } = Opts::parse();
+
+    let task = if dry_run {
+        TaskKind::DryRun
+    } else if print_jobs {
+        TaskKind::PrintJobs
+    } else {
+        TaskKind::Execute
+    };
+
+    cargo_feature_matrix::run(
+        command,
+        args,
+        task,
+        manifest_path,
+        Config::default(),
+    )?;
+
+    Ok(())
 }
