@@ -2,40 +2,38 @@ use crate::Config;
 use cargo_metadata::Package;
 use derive_more::{AsMut, AsRef, Deref, DerefMut};
 use itertools::Itertools;
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::{
+    borrow::Cow,
     collections::{BTreeSet, HashSet},
     fmt::{Display, Formatter},
     ops::Deref,
 };
-use thiserror::Error;
 
 #[derive(
     Clone, Debug, Default, Deref, DerefMut, AsRef, AsMut, Serialize, Deserialize,
 )]
+#[serde(transparent)]
 pub struct FeatureMatrix<'f>(#[serde(borrow)] HashSet<FeatureSet<'f>>);
 
 impl<'f> FeatureMatrix<'f> {
-    pub(crate) fn new(
-        package: &'f Package,
-        config: &'f Config<'f>,
-    ) -> Result<Self, MissingFeature> {
+    pub(crate) fn new(package: &'f Package, config: &'f Config<'f>) -> Self {
         let mut include = config.include.clone();
-        include.add_transitive_features(package)?;
+        include.add_transitive_features(package);
         let include = include;
 
         extract_seed(package, config)
             .into_iter()
             .powerset()
             .map(FeatureSet::from_iter)
-            .map(|mut set| -> Result<_, MissingFeature> {
+            .map(|mut set| {
                 set.extend(include.clone());
-                set.add_transitive_features(package)?;
-                Ok(set)
+                set.add_transitive_features(package);
+                set
             })
-            .filter_ok(|set| set.is_disjoint(&config.deny))
-            .filter_ok(|set| !config.skip.iter().any(|skip| skip == set))
-            .filter_ok(|set| {
+            .filter(|set| set.is_disjoint(&config.deny))
+            .filter(|set| !config.skip.iter().any(|skip| skip == set))
+            .filter(|set| {
                 !config
                     .conflict
                     .iter()
@@ -57,7 +55,7 @@ fn extract_seed<'f>(
         package
             .features
             .keys()
-            .map(|feature| Feature(feature))
+            .map(|feature| Feature(Cow::Borrowed(feature)))
             // exclude default feature
             .filter(|feature| feature.0 != "default")
             // exclude deny list because they will all end up denied anyways
@@ -81,6 +79,7 @@ fn extract_seed<'f>(
                                 .unwrap_or(&dependency.name)
                         })
                     })
+                    .map(Cow::Borrowed)
                     .map(Feature),
             )
             .collect()
@@ -88,30 +87,38 @@ fn extract_seed<'f>(
 }
 
 #[derive(
-    Clone, Debug, Default, Eq, PartialEq, Hash, Deref, DerefMut, AsRef, AsMut,
+    Clone,
+    Debug,
+    Default,
+    Eq,
+    PartialEq,
+    Hash,
+    Deref,
+    DerefMut,
+    AsRef,
+    AsMut,
+    Serialize,
+    Deserialize,
 )]
+#[serde(transparent)]
 pub struct FeatureSet<'f>(BTreeSet<Feature<'f>>);
 
 impl<'f> FeatureSet<'f> {
-    fn add_transitive_features(
-        &mut self,
-        package: &'f Package,
-    ) -> Result<(), MissingFeature> {
+    fn add_transitive_features(&mut self, package: &'f Package) {
         let raw_features = &package.features;
         let transitive = self
             .iter()
-            .map(|feature| -> Result<_, _> {
-                Ok(raw_features
-                    .get(*feature.as_ref())
-                    .ok_or_else(|| MissingFeature(feature.to_string()))?
-                    .iter()
-                    .map(AsRef::<str>::as_ref))
+            .map(|feature| {
+                raw_features
+                    .get(feature.as_ref())
+                    .map(|transitives| transitives.iter().map(AsRef::as_ref))
             })
-            .flatten_ok()
-            .map_ok(Feature)
-            .collect::<Result<Vec<_>, _>>()?;
+            .flatten()
+            .flatten()
+            .map(Cow::Borrowed)
+            .map(Feature)
+            .collect_vec();
         self.extend(transitive);
-        Ok(())
     }
 }
 
@@ -131,16 +138,9 @@ impl<'f> FeatureSet<'f> {
     Deserialize,
 )]
 #[serde(transparent)]
-pub struct Feature<'f>(pub(crate) &'f str);
-
-impl Serialize for FeatureSet<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&self.to_string())
-    }
-}
+#[as_ref(forward)]
+#[as_mut(forward)]
+pub struct Feature<'f>(pub(crate) Cow<'f, str>);
 
 impl<'f> FromIterator<FeatureSet<'f>> for FeatureMatrix<'f> {
     fn from_iter<T: IntoIterator<Item = FeatureSet<'f>>>(iter: T) -> Self {
@@ -157,35 +157,6 @@ impl<'f> IntoIterator for FeatureMatrix<'f> {
     }
 }
 
-impl<'de: 'f, 'f> Deserialize<'de> for FeatureSet<'f> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        return deserializer.deserialize_str(Visitor);
-
-        struct Visitor;
-
-        impl<'de> de::Visitor<'de> for Visitor {
-            type Value = FeatureSet<'de>;
-
-            fn expecting(&self, f: &mut Formatter) -> std::fmt::Result {
-                write!(f, "a valid feature set")
-            }
-
-            fn visit_borrowed_str<E>(
-                self,
-                v: &'de str,
-            ) -> Result<Self::Value, E>
-            where
-                E: de::Error,
-            {
-                Ok(FeatureSet::from(v))
-            }
-        }
-    }
-}
-
 impl Display for FeatureSet<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut iter = self.iter();
@@ -196,12 +167,6 @@ impl Display for FeatureSet<'_> {
             write!(f, ",{}", feature)?;
         }
         Ok(())
-    }
-}
-
-impl<'f> From<&'f str> for FeatureSet<'f> {
-    fn from(s: &'f str) -> Self {
-        s.split(',').map(Feature).collect()
     }
 }
 
@@ -225,7 +190,3 @@ impl Display for Feature<'_> {
         Display::fmt(&self.0, f)
     }
 }
-
-#[derive(Debug, Error)]
-#[error("feature `{}` not present in Cargo.toml", _0)]
-pub struct MissingFeature(String);

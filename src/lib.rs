@@ -5,7 +5,10 @@ pub mod features;
 pub use self::{config::Config, execution::TaskKind};
 use self::{execution::Task, features::FeatureMatrix};
 use cargo_metadata::{Metadata, MetadataCommand, Package};
-use itertools::Itertools;
+use figment::{
+    providers::{Format, Json},
+    Figment,
+};
 use std::path::PathBuf;
 use thiserror::Error;
 
@@ -14,7 +17,7 @@ pub fn run(
     args: Vec<String>,
     task: TaskKind,
     manifest_path: Option<PathBuf>,
-    config: Config,
+    figment: Figment,
 ) -> Result<(), Error> {
     let mut cmd = MetadataCommand::new();
     if let Some(manifest_path) = manifest_path {
@@ -22,22 +25,29 @@ pub fn run(
     }
     let metadata = cmd.exec()?;
 
-    let matrices: Vec<_> = get_workspace_members(&metadata)
-        .map(|package| {
-            FeatureMatrix::new(package, &config)
-                .map(|matrix| (&package.name, matrix))
-        })
-        .try_collect()?;
+    let mut error = None;
+    for package in get_workspace_members(&metadata) {
+        let figment = if let Some(package_config) =
+            package.metadata.get("feature-matrix")
+        {
+            figment
+                .clone()
+                .merge(Figment::from(Json::string(&package_config.to_string())))
+        } else {
+            figment.clone()
+        };
 
-    let (_, errors): (Vec<_>, Vec<_>) = matrices
-        .into_iter()
-        .map(|(package_name, matrix)| {
-            Task::new(task, &command, package_name, &args, matrix)
-        })
-        .map(Task::run)
-        .partition_result();
+        let config = Config::from(figment)?;
 
-    match errors.into_iter().next() {
+        let matrix = FeatureMatrix::new(package, &config);
+        let task = Task::new(task, &command, &package.name, &args, matrix);
+
+        if let Err(err) = task.run() {
+            error = Some(err);
+        }
+    }
+
+    match error {
         Some(err) => Err(err),
         None => Ok(()),
     }
@@ -57,8 +67,6 @@ fn get_workspace_members(
 pub enum Error {
     #[error("failed to get cargo metadata")]
     Metadata(#[from] cargo_metadata::Error),
-    #[error(transparent)]
-    InvalidFeature(#[from] features::MissingFeature),
     #[error("{}", message)]
     Io {
         message: &'static str,
@@ -67,6 +75,8 @@ pub enum Error {
     },
     #[error("child process exited with {}", _0)]
     Fail(std::process::ExitStatus),
+    #[error("failed to get config from metadata")]
+    Config(#[from] figment::Error),
 }
 
 #[cfg(test)]

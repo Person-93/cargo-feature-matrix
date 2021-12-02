@@ -99,7 +99,7 @@ fn main() -> Result<()> {
         args,
         task,
         manifest_path,
-        Config::default(),
+        Config::figment(),
     )?;
 
     Ok(())
