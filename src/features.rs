@@ -5,7 +5,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
-    collections::{BTreeSet, HashSet},
+    collections::BTreeSet,
     fmt::{Display, Formatter},
     ops::Deref,
 };
@@ -14,7 +14,7 @@ use std::{
     Clone, Debug, Default, Deref, DerefMut, AsRef, AsMut, Serialize, Deserialize,
 )]
 #[serde(transparent)]
-pub struct FeatureMatrix<'f>(#[serde(borrow)] HashSet<FeatureSet<'f>>);
+pub struct FeatureMatrix<'f>(#[serde(borrow)] BTreeSet<FeatureSet<'f>>);
 
 impl<'f> FeatureMatrix<'f> {
     pub(crate) fn new(package: &'f Package, config: &'f Config<'f>) -> Self {
@@ -90,6 +90,8 @@ fn extract_seed<'f>(
     Clone,
     Debug,
     Default,
+    Ord,
+    PartialOrd,
     Eq,
     PartialEq,
     Hash,
