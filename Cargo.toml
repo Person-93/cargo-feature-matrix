@@ -9,7 +9,7 @@ license = "MIT"
 [dependencies]
 anyhow = "1.0.51"
 cargo_metadata = "0.14.1"
-clap = { version = "3.0.0-beta.5", features = ["wrap_help"] }
+clap = { version = "=3.0.0-beta.5", features = ["wrap_help"] }
 crossterm = "0.22.1"
 derive_more = "0.99.17"
 figment = "0.10.6"
