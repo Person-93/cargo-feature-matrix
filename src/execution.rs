@@ -58,7 +58,9 @@ impl<'t> Task<'t> {
                 cmd.arg(self.command)
                     .args(self.args.iter())
                     .stderr(Stdio::piped())
-                    .stdout(Stdio::null());
+                    .stdout(Stdio::null())
+                    .arg("--package")
+                    .arg(self.package_name);
 
                 if !feature_set.is_empty() {
                     cmd.arg("--features").arg(feature_set.to_string());
@@ -108,9 +110,10 @@ impl<'t> Task<'t> {
 
     fn print_jobs(self) {
         let prefix = format!(
-            "{} {} {}",
+            "{} {} --package {} {}",
             CARGO.to_string_lossy(),
             self.command,
+            self.package_name,
             self.args.join(" ")
         );
         for feature_set in self.matrix {
