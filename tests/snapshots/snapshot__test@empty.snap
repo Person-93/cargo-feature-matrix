@@ -1,0 +1,6 @@
+---
+source: tests/snapshot.rs
+expression: output
+
+---
+running: cmd=clippy package=sample features=[]......OK

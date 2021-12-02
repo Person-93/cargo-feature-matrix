@@ -1,0 +1,13 @@
+[package]
+name = "sample"
+version = "0.0.0"
+edition = "2021"
+
+[features]
+feat-a = []
+feat-b = []
+feat-c = []
+feat-z = []
+
+[package.metadata.feature-matrix]
+seed = ["feat-a", "feat-b"]

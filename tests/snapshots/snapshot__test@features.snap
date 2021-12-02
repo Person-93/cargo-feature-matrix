@@ -1,0 +1,37 @@
+---
+source: tests/snapshot.rs
+expression: output
+
+---
+running: cmd=clippy package=sample features=[]......OK
+running: cmd=clippy package=sample features=[feat-a]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-c]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-c,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-c,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-c,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-c]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-c,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-c,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-c,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-a,serde]......OK
+running: cmd=clippy package=sample features=[feat-b]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-c]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-c,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-c,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-c,serde]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-b,serde]......OK
+running: cmd=clippy package=sample features=[feat-c]......OK
+running: cmd=clippy package=sample features=[feat-c,feat-z]......OK
+running: cmd=clippy package=sample features=[feat-c,feat-z,serde]......OK
+running: cmd=clippy package=sample features=[feat-c,serde]......OK
+running: cmd=clippy package=sample features=[feat-z]......OK
+running: cmd=clippy package=sample features=[feat-z,serde]......OK
+running: cmd=clippy package=sample features=[serde]......OK

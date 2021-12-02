@@ -1,0 +1,13 @@
+[package]
+name = "sample"
+version = "0.0.0"
+edition = "2021"
+
+[features]
+feat-a = ["feat-b"]
+feat-b = []
+feat-c = ["feat-d"]
+feat-d = []
+
+[package.metadata.feature-matrix]
+include = ["feat-d"]

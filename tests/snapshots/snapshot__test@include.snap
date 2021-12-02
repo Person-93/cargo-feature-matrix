@@ -1,0 +1,11 @@
+---
+source: tests/snapshot.rs
+expression: output
+
+---
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-c,feat-d]......OK
+running: cmd=clippy package=sample features=[feat-a,feat-b,feat-d]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-c,feat-d]......OK
+running: cmd=clippy package=sample features=[feat-b,feat-d]......OK
+running: cmd=clippy package=sample features=[feat-c,feat-d]......OK
+running: cmd=clippy package=sample features=[feat-d]......OK
