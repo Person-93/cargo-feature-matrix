@@ -5,7 +5,7 @@ version = "0.2.1-dev"
 edition = "2021"
 description = "run cargo commands on a matrix of feature sets"
 license = "MIT"
-repository = "https://github.com/Person-93/cargo-all-features"
+repository = "https://github.com/Person-93/cargo-feature-matrix"
 
 [dependencies]
 anyhow = "1.0.51"
