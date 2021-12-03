@@ -35,7 +35,6 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-bins-
 
       - name: install tools
-        if: steps.cache.outputs.cache_hit != 'true'
         uses: actions-rs/cargo@v1
         with:
           command: install
