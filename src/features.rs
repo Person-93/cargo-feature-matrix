@@ -192,3 +192,9 @@ impl Display for Feature<'_> {
         Display::fmt(&self.0, f)
     }
 }
+
+impl From<String> for Feature<'static> {
+    fn from(s: String) -> Self {
+        Feature(Cow::Owned(s))
+    }
+}
