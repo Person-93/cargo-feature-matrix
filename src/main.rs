@@ -1,9 +1,11 @@
 use anyhow::Result;
+use cargo_feature_matrix::features::{Feature, FeatureSet};
 use cargo_feature_matrix::{Config, TaskKind};
 use clap::{
     crate_authors, crate_description, crate_license, crate_name, crate_version,
-    AppSettings, ArgEnum, Parser,
+    AppSettings, ArgEnum, ArgSettings, Parser,
 };
+use figment::Figment;
 use itertools::Itertools;
 use std::{env, path::PathBuf};
 use yansi::Paint;
@@ -30,6 +32,10 @@ struct Opts {
     #[clap(long, arg_enum, default_value = "auto")]
     color: ColorChoice,
 
+    /// Add these features to the deny list
+    #[clap(short, long, require_delimiter = true, setting = ArgSettings::UseValueDelimiter)]
+    deny: Vec<String>,
+
     /// Print a list of all the cargo commands one per line.
     ///
     /// This is intended to be consumed by external job runners.
@@ -37,7 +43,7 @@ struct Opts {
     print_jobs: bool,
 
     /// Perform a dry run and print output as if all the jobs succeeded.
-    #[clap(short, long, conflicts_with("print-jobs"))]
+    #[clap(long, conflicts_with("print-jobs"))]
     dry_run: bool,
 
     /// The path to the cargo manifest file to use.
@@ -64,6 +70,7 @@ fn main() -> Result<()> {
         command,
         color,
         args,
+        deny,
         print_jobs,
         dry_run,
         manifest_path,
@@ -94,12 +101,15 @@ fn main() -> Result<()> {
         TaskKind::Execute
     };
 
+    let mut config = Config::default();
+    config.deny = FeatureSet::from_iter(deny.into_iter().map(Feature::from));
+
     cargo_feature_matrix::run(
         command,
         args,
         task,
         manifest_path,
-        Config::figment(),
+        Figment::from(config),
     )?;
 
     Ok(())

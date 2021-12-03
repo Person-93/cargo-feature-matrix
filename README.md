@@ -45,7 +45,10 @@ OPTIONS:
             [default: auto]
             [possible values: auto, always, never]
 
-    -d, --dry-run
+    -d, --deny <DENY>...
+            Add these features to the deny list
+
+        --dry-run
             Perform a dry run and print output as if all the jobs succeeded
 
     -h, --help
