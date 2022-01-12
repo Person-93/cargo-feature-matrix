@@ -1,10 +1,13 @@
 use crate::{features::FeatureMatrix, Error};
 use lazy_static::lazy_static;
-use std::{env, ffi::OsString, io::Write, process::Command, process::Stdio};
+use std::{
+    env, ffi::OsString, io::Write, path::Path, process::Command, process::Stdio,
+};
 use yansi::Color::*;
 
 pub(crate) struct Task<'t> {
     matrix: FeatureMatrix<'t>,
+    manifest_path: Option<&'t Path>,
     package_name: &'t str,
     args: &'t [String],
     command: &'t str,
@@ -22,12 +25,14 @@ impl<'t> Task<'t> {
     pub(crate) fn new(
         kind: TaskKind,
         command: &'t str,
+        manifest_path: Option<&'t Path>,
         package_name: &'t str,
         args: &'t [String],
         matrix: FeatureMatrix<'t>,
     ) -> Self {
         Self {
             matrix,
+            manifest_path,
             package_name,
             args,
             command,
@@ -61,6 +66,10 @@ impl<'t> Task<'t> {
                     .stdout(Stdio::null())
                     .arg("--package")
                     .arg(self.package_name);
+
+                if let Some(manifest_path) = self.manifest_path {
+                    cmd.arg("--manifest-path").arg(manifest_path);
+                }
 
                 if !feature_set.is_empty() {
                     cmd.arg("--features").arg(feature_set.to_string());

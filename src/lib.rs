@@ -20,7 +20,7 @@ pub fn run(
     figment: Figment,
 ) -> Result<(), Error> {
     let mut cmd = MetadataCommand::new();
-    if let Some(manifest_path) = manifest_path {
+    if let Some(manifest_path) = &manifest_path {
         cmd.manifest_path(manifest_path);
     }
     let metadata = cmd.exec()?;
@@ -40,7 +40,14 @@ pub fn run(
         let config = Config::from(figment)?;
 
         let matrix = FeatureMatrix::new(package, &config);
-        let task = Task::new(task, &command, &package.name, &args, matrix);
+        let task = Task::new(
+            task,
+            &command,
+            manifest_path.as_deref(),
+            &package.name,
+            &args,
+            matrix,
+        );
 
         if let Err(err) = task.run() {
             error = Some(err);
