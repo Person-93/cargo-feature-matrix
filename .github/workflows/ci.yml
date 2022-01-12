@@ -1,5 +1,17 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    paths:
+    - '**'
+    - "!/*.md"
+    - "!/docs/**"
+    - "!/LICENSE-*.txt"
+  pull_request:
+    paths:
+    - '**'
+    - "!/*.md"
+    - "!/docs/**"
+    - "!/LICENSE-*.txt"
 jobs:
   test:
     runs-on: ${{ matrix.os }}
