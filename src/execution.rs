@@ -63,7 +63,7 @@ impl<'t> Task<'t> {
                 cmd.arg(self.command)
                     .args(self.args.iter())
                     .stderr(Stdio::piped())
-                    .stdout(Stdio::null())
+                    .stdout(Stdio::piped())
                     .arg("--package")
                     .arg(self.package_name);
 
@@ -107,6 +107,9 @@ impl<'t> Task<'t> {
                         std::io::stderr()
                             .write_all(&output.stderr)
                             .expect("failed to write to stderr");
+                        std::io::stdout()
+                            .write_all(&output.stdout)
+                            .expect("failed to write to stdout");
                     }
                 }
             };
