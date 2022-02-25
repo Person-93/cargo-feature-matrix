@@ -1,4 +1,5 @@
 allow-branch = ["master"]
+dev-version = true
 dev-version-ext = "dev"
 pre-release-commit-message = "chore(release): {{version}}"
 post-release-commit-message = "chore(release): version bump {{next_version}}"
