@@ -1,55 +1,35 @@
-default_stages: [commit]
+default_stages: [ commit ]
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.0.1
-  hooks:
-  - id: check-added-large-files
-  - id: check-case-conflict
-  - id: check-json
-  - id: check-merge-conflict
-  - id: check-symlinks
-  - id: check-toml
-  - id: check-xml
-  - id: check-yaml
-  - id: end-of-file-fixer
-  - id: trailing-whitespace
-  # NOTE uncomment no-commit-to-branch once project gets underway
-#      - id: no-commit-to-branch
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 2.1.5
-  hooks:
-  - id: check-mailmap
-  - id: forbid-binary
-    exclude: (.*(woff2?|ttf)|logo.png)$
-  - id: git-check
-  - id: script-must-have-extension
-  - id: script-must-not-have-extension
-  - id: shellcheck
-- repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-  rev: v5.0.0
-  hooks:
-  - id: commitlint
-    stages: [commit-msg]
-- repo: local
-  hooks:
-  - name: format
-    id: format
-    language: system
-    entry: cargo
-    args: [make, check-format]
-    types: [rust]
-    pass_filenames: false
-  - name: clippy
-    id: clippy
-    language: system
-    entry: cargo
-    args: [make, clippy]
-    types: [rust]
-    pass_filenames: false
-  - name: clippy-strict
-    id: clippy-strict
-    language: system
-    entry: bash -c "CARGO_MAKE_CLIPPY_ARGS=\"[-- -D warnings]\" cargo make clippy"
-    always_run: true
-    stages: [push]
-    pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      # NOTE uncomment no-commit-to-branch once project gets underway
+  #      - id: no-commit-to-branch
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 2.1.5
+    hooks:
+      - id: check-mailmap
+      - id: forbid-binary
+        exclude: (.*(woff2?|ttf)|logo.png)$
+      - id: git-check
+      - id: script-must-have-extension
+      - id: script-must-not-have-extension
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.8.0
+    hooks:
+      - id: shellcheck
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v5.0.0
+    hooks:
+      - id: commitlint
+        stages: [ commit-msg ]
