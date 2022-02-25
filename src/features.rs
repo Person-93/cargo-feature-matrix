@@ -110,12 +110,11 @@ impl<'f> FeatureSet<'f> {
         let raw_features = &package.features;
         let transitive = self
             .iter()
-            .map(|feature| {
+            .filter_map(|feature| {
                 raw_features
                     .get(feature.as_ref())
                     .map(|transitives| transitives.iter().map(AsRef::as_ref))
             })
-            .flatten()
             .flatten()
             .map(Cow::Borrowed)
             .map(Feature)

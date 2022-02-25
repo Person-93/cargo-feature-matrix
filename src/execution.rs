@@ -72,7 +72,7 @@ impl<'t> Task<'t> {
                 }
 
                 if !feature_set.is_empty() {
-                    cmd.arg("--features").arg(feature_set.to_string());
+                    cmd.arg("--features").arg(&feature_set);
                 }
 
                 Some(cmd)
