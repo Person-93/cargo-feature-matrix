@@ -58,6 +58,7 @@ fn extract_seed<'f>(
             .map(|feature| Feature(Cow::Borrowed(feature)))
             // exclude default feature
             .filter(|feature| feature.0 != "default")
+            .filter(|feature| !feature.starts_with("dep:"))
             // exclude deny list because they will all end up denied anyways
             .filter(|package| !config.deny.iter().contains(package))
             // exclude the include list because it'll be easier to just add them all at once
@@ -111,9 +112,12 @@ impl<'f> FeatureSet<'f> {
         let transitive = self
             .iter()
             .filter_map(|feature| {
-                raw_features
-                    .get(feature.as_ref())
-                    .map(|transitives| transitives.iter().map(AsRef::as_ref))
+                raw_features.get(feature.as_ref()).map(|transitives| {
+                    transitives
+                        .iter()
+                        .filter(|transitive| !transitive.starts_with("dep:"))
+                        .map(AsRef::as_ref)
+                })
             })
             .flatten()
             .map(Cow::Borrowed)
