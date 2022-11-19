@@ -88,6 +88,7 @@ impl<'t> Task<'t> {
                 feature_set,
                 Cyan.paint("]")
             );
+            std::io::stdout().flush().expect("failed to flush stdout");
 
             let on_success =
                 || println!("{}", Black.style().bg(Green).paint("OK"));
