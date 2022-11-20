@@ -7,4 +7,3 @@ running: cmd=test package=sample features=[]......OK
 running: cmd=test package=sample features=[feat-a]......OK
 running: cmd=test package=sample features=[feat-a,feat-b]......OK
 running: cmd=test package=sample features=[feat-b]......OK
-
