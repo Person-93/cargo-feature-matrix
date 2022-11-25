@@ -64,6 +64,7 @@ impl<'t> Task<'t> {
                     .args(self.args.iter())
                     .stderr(Stdio::piped())
                     .stdout(Stdio::piped())
+                    .arg("--no-default-features")
                     .arg("--package")
                     .arg(self.package_name);
 

@@ -11,4 +11,4 @@ feat-z = []
 
 [dependencies]
 serde = { version = "1.0.130", optional = true }
-rand = "0.1.0"
+rand = "0.8.5"
