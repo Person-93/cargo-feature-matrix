@@ -1,1 +1,12 @@
+edition = "2021"
+force_explicit_abi = true
+hard_tabs = false
 max_width = 80
+newline_style = "Auto"
+remove_nested_parens = true
+reorder_imports = true
+reorder_modules = true
+tab_spaces = 2
+use_field_init_shorthand = true
+use_small_heuristics = "Default"
+use_try_shorthand = true
