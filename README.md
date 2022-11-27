@@ -17,8 +17,8 @@ cargo install cargo-feature-matrix
 
 ## Usage
 
-Any cargo command that accepts a `--package` and `--features` flag can be
-run with this command.
+Any cargo command that accepts a `--package`, `--features`, and
+`--no-default-features` flag can be run with this command.
 ```shell
 cargo feature-matrix [OPTIONS] <COMMAND> [-- <COMMAND_ARGS_AND_FLAGS>...]
 ```
