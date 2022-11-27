@@ -8,18 +8,18 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/Person-93/cargo-feature-matrix"
 
 [dependencies]
-anyhow = "1.0.51"
+anyhow = "1.0.66"
 atty = "0.2.14"
-cargo_metadata = "0.14.1"
+cargo_metadata = "0.15.2"
 clap = { version = "=3.0.0-beta.5", features = ["wrap_help"] }
 derive_more = "0.99.17"
-figment = { version = "0.10.6", features = ["json"] }
-itertools = "0.10.1"
+figment = { version = "0.10.8", features = ["json"] }
+itertools = "0.10.5"
 lazy_static = "1.4.0"
-serde = { version = "1.0.130", features = ["derive"] }
-thiserror = "1.0.30"
-yansi = "0.5.0"
+serde = { version = "1.0.147", features = ["derive"] }
+thiserror = "1.0.37"
+yansi = "0.5.1"
 
 [dev-dependencies]
-assert_cmd = "2.0.2"
-insta = { version = "1.8.0", features = ["glob"] }
+assert_cmd = "2.0.6"
+insta = { version = "1.21.1", features = ["glob"] }
