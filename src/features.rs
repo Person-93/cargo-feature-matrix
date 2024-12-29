@@ -72,14 +72,10 @@ fn extract_seed<'f>(
                 package
                     .dependencies
                     .iter()
-                    .filter_map(|dependency| {
-                        dependency.optional.then(|| {
-                            dependency
+                    .filter(|&dependency| dependency.optional).map(|dependency| dependency
                                 .rename
                                 .as_deref()
-                                .unwrap_or(&dependency.name)
-                        })
-                    })
+                                .unwrap_or(&dependency.name))
                     .map(Cow::Borrowed)
                     .map(Feature),
             )
