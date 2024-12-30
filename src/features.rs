@@ -67,18 +67,6 @@ fn extract_seed<'f>(
             .filter(|feature| {
                 config.include_hidden || !feature.starts_with("__")
             })
-            // add the optional dependencies to the list
-            .chain(
-                package
-                    .dependencies
-                    .iter()
-                    .filter(|&dependency| dependency.optional).map(|dependency| dependency
-                                .rename
-                                .as_deref()
-                                .unwrap_or(&dependency.name))
-                    .map(Cow::Borrowed)
-                    .map(Feature),
-            )
             .collect()
   }
 }

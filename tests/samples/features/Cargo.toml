@@ -6,9 +6,10 @@ edition = "2021"
 [features]
 feat-a = []
 feat-b = []
-feat-c = []
-feat-z = []
+feat-c = ["dep:bitflags"]
+feat-z = ["serde"]
 
 [dependencies]
+bitflags = { version = "2", optional = true }
 serde = { version = "1.0.130", optional = true }
 rand = "0.8.5"
