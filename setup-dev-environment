@@ -15,10 +15,7 @@ fi
 
 readonly dependencies=(
   cargo
-  cargo-make
-  cargo-clippy
   pre-commit
-  shellcheck
 )
 
 function main() {
@@ -26,9 +23,7 @@ function main() {
   check_dependencies
 
   status "Installing git hooks..."
-  pre-commit install --install-hooks -t pre-commit -t pre-merge-commit \
-    -t pre-push -t prepare-commit-msg -t commit-msg -t post-commit \
-    -t post-checkout -t post-merge
+  pre-commit install --install-hooks -t pre-commit -t commit-msg
 
   status "Dev environment is set up!"
 }
