@@ -97,3 +97,10 @@ fn main() -> Result<()> {
 
   Ok(())
 }
+
+#[cfg(test)]
+#[test]
+fn test_cli() {
+  use clap::CommandFactory;
+  Opts::command().debug_assert();
+}
