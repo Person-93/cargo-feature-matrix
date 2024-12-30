@@ -66,7 +66,7 @@ fn main() -> Result<()> {
 
   match color {
     ColorChoice::Auto => {
-      let enable = env::var("TERM").map_or(true, |term| term == "dumb")
+      let enable = env::var("TERM").map_or(true, |term| term != "dumb")
         && std::io::stdout().is_terminal();
       if !enable {
         yansi::disable();
