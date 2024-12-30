@@ -7,7 +7,7 @@ use clap::{
 };
 use figment::Figment;
 use itertools::Itertools;
-use std::{env, path::PathBuf};
+use std::{env, io::IsTerminal, path::PathBuf};
 use yansi::Paint;
 
 #[derive(Debug, Parser)]
@@ -84,7 +84,7 @@ fn main() -> Result<()> {
       }
 
       if env::var("TERM").map_or(true, |term| term == "dumb")
-        || atty::isnt(atty::Stream::Stdout)
+        || !std::io::stdout().is_terminal()
       {
         Paint::disable();
       }
