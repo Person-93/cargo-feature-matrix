@@ -5,12 +5,15 @@ pub mod features;
 pub use self::{config::Config, execution::TaskKind};
 use self::{execution::Task, features::FeatureMatrix};
 use cargo_metadata::{Metadata, MetadataCommand, Package};
+use derive_more::{
+  derive::{Display, Error},
+  From,
+};
 use figment::{
   providers::{Format, Json},
   Figment,
 };
 use std::path::PathBuf;
-use thiserror::Error;
 
 pub fn run(
   command: String,
@@ -69,20 +72,21 @@ fn get_workspace_members(
     .filter(|package| metadata.workspace_members.contains(&package.id))
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Display, Error, From)]
 pub enum Error {
-  #[error("failed to get cargo metadata")]
-  Metadata(#[from] cargo_metadata::Error),
-  #[error("{}", message)]
+  #[display("failed to get cargo metadata")]
+  Metadata(cargo_metadata::Error),
+  #[display("{message}")]
   Io {
     message: &'static str,
-    #[source]
     source: std::io::Error,
   },
-  #[error("child process exited with {}", _0)]
+  #[display("child process exited with {_0}")]
+  #[from(ignore)]
+  #[error(ignore)]
   Fail(std::process::ExitStatus),
-  #[error("failed to get config from metadata")]
-  Config(#[from] figment::Error),
+  #[display("failed to get config from metadata")]
+  Config(figment::Error),
 }
 
 #[cfg(test)]

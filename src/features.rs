@@ -7,7 +7,6 @@ use std::{
   borrow::Cow,
   collections::BTreeSet,
   fmt::{Display, Formatter},
-  ops::Deref,
 };
 
 #[derive(

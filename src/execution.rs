@@ -3,7 +3,7 @@ use lazy_static::lazy_static;
 use std::{
   env, ffi::OsString, io::Write, path::Path, process::Command, process::Stdio,
 };
-use yansi::Color::*;
+use yansi::Paint;
 
 pub(crate) struct Task<'t> {
   matrix: FeatureMatrix<'t>,
@@ -82,17 +82,18 @@ impl<'t> Task<'t> {
 
       print!(
         "{}{} {}{} {}{}{}......",
-        Cyan.paint("running: cmd="),
+        "running: cmd=".cyan(),
         self.command,
-        Cyan.paint("package="),
+        "package=".cyan(),
         self.package_name,
-        Cyan.paint("features=["),
+        "features=[".cyan(),
         feature_set,
-        Cyan.paint("]")
+        "]".cyan(),
       );
       std::io::stdout().flush().expect("failed to flush stdout");
 
-      let on_success = || println!("{}", Black.style().bg(Green).paint("OK"));
+      // let on_success = || println!("{}", Black.style().bg(Green).paint("OK"));
+      let on_success = || println!("{}", "OK".black().on_green());
 
       match cmd {
         None => on_success(),
@@ -104,7 +105,8 @@ impl<'t> Task<'t> {
           if output.status.success() {
             on_success();
           } else {
-            println!("{}", Black.style().bg(Red).paint("Fail"));
+            // println!("{}", Black.style().bg(Red).paint("Fail"));
+            println!("{}", "Fail".black().on_red());
             exit_status = Some(output.status);
             std::io::stderr()
               .write_all(&output.stderr)
