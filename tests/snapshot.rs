@@ -1,7 +1,7 @@
 use assert_cmd::Command;
 use insta::{assert_snapshot, glob, with_settings};
 use lazy_static::lazy_static;
-use std::{env, path::PathBuf};
+use std::path::PathBuf;
 
 #[test]
 fn test() {

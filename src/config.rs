@@ -39,8 +39,8 @@ pub struct Config<'c> {
 }
 
 impl Config<'_> {
-  pub fn from<T: Provider>(provider: T) -> Result<Self, Error> {
-    Figment::from(provider).extract()
+  pub fn from<T: Provider>(provider: T) -> Result<Self, Box<Error>> {
+    Ok(Figment::from(provider).extract()?)
   }
 
   pub fn figment() -> Figment {

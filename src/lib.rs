@@ -86,7 +86,7 @@ pub enum Error {
   #[error(ignore)]
   Fail(std::process::ExitStatus),
   #[display("failed to get config from metadata")]
-  Config(figment::Error),
+  Config(Box<figment::Error>),
 }
 
 #[cfg(test)]
