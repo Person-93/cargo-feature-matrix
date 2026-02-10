@@ -10,7 +10,8 @@ use std::{env, io::IsTerminal, path::PathBuf};
 #[command(author, version, about, bin_name = "cargo feature-matrix")]
 struct Opts {
   /// The cargo command to run.
-  command: String,
+  #[arg(required = true)]
+  command: Option<String>,
 
   /// Arguments to pass to the cargo command
   #[arg(last = true)]
@@ -30,8 +31,15 @@ struct Opts {
   #[arg(short, long)]
   print_jobs: bool,
 
+  /// Print all the feature-sets one per line with no command.
+  ///
+  /// NOTE: This does not include the empty set as the empty set will require
+  ///       special handling by consumers anyways.
+  #[arg(long, conflicts_with("print_jobs"), conflicts_with("command"))]
+  print_matrix: bool,
+
   /// Perform a dry run and print output as if all the jobs succeeded.
-  #[arg(long, conflicts_with("print_jobs"))]
+  #[arg(long, conflicts_with("print_jobs"), conflicts_with("print_matrix"))]
   dry_run: bool,
 
   /// The path to the cargo manifest file to use.
@@ -60,6 +68,7 @@ fn main() -> Result<()> {
     args,
     deny,
     print_jobs,
+    print_matrix,
     dry_run,
     manifest_path,
   } = Opts::parse_from(args);
@@ -80,6 +89,8 @@ fn main() -> Result<()> {
     TaskKind::DryRun
   } else if print_jobs {
     TaskKind::PrintJobs
+  } else if print_matrix {
+    TaskKind::PrintMatrix
   } else {
     TaskKind::Execute
   };
@@ -88,7 +99,7 @@ fn main() -> Result<()> {
   config.deny = FeatureSet::from_iter(deny.into_iter().map(Feature::from));
 
   cargo_feature_matrix::run(
-    command,
+    command.unwrap_or_default(),
     args,
     task,
     manifest_path,

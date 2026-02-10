@@ -18,6 +18,7 @@ pub(crate) struct Task<'t> {
 pub enum TaskKind {
   DryRun,
   PrintJobs,
+  PrintMatrix,
   Execute,
 }
 
@@ -45,6 +46,10 @@ impl<'t> Task<'t> {
       TaskKind::DryRun => self.execute(true),
       TaskKind::PrintJobs => {
         self.print_jobs();
+        Ok(())
+      }
+      TaskKind::PrintMatrix => {
+        self.print_matrix();
         Ok(())
       }
       TaskKind::Execute => self.execute(false),
@@ -139,6 +144,15 @@ impl<'t> Task<'t> {
       } else {
         println!("{} --features {}", prefix, feature_set);
       }
+    }
+  }
+
+  fn print_matrix(self) {
+    for feature_set in self.matrix {
+      if feature_set.is_empty() {
+        continue;
+      }
+      println!("{feature_set}");
     }
   }
 }

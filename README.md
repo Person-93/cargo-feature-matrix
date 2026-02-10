@@ -30,42 +30,47 @@ cargo feature-matrix [OPTIONS] <COMMAND> [-- <COMMAND_ARGS_AND_FLAGS>...]
 Here is the output of `cargo help feature-matrix`:
 
 ```text
-USAGE:
-    cargo feature-matrix [OPTIONS] <COMMAND> [-- <ARGS>...]
+Usage: cargo feature-matrix [OPTIONS] <COMMAND> [-- <ARGS>...]
 
-ARGS:
-    <COMMAND>
-            The cargo commands to run
+Arguments:
+  <COMMAND>
+          The cargo command to run
 
-    <ARGS>...
-            Arguments to pass to the cargo command
+  [ARGS]...
+          Arguments to pass to the cargo command
 
-OPTIONS:
-        --color <COLOR>
-            Colorize output
+Options:
+      --color <COLOR>
+          Colorize output
 
-            [default: auto]
-            [possible values: auto, always, never]
+          [default: auto]
+          [possible values: auto, always, never]
 
-    -d, --deny <DENY>...
-            Add these features to the deny list
+  -d, --deny <DENY>
+          Add these features to the deny list
 
-        --dry-run
-            Perform a dry run and print output as if all the jobs succeeded
+  -p, --print-jobs
+          Print a list of all the cargo commands one per line.
 
-    -h, --help
-            Print help information
+          This is intended to be consumed by external job runners.
 
-    -m, --manifest-path <MANIFEST_PATH>
-            The path to the cargo manifest file to use
+      --print-matrix
+          Print all the feature-sets one per line with no command.
 
-    -p, --print-jobs
-            Print a list of all the cargo commands one per line.
+          NOTE: This does not include the empty set as the empty set will
+                require special handling by consumers anyways.
 
-            This is intended to be consumed by external job runners.
+      --dry-run
+          Perform a dry run and print output as if all the jobs succeeded
 
-    -V, --version
-            Print version information
+  -m, --manifest-path <MANIFEST_PATH>
+          The path to the cargo manifest file to use
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```
 
 ### Config
