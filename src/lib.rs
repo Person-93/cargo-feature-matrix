@@ -6,12 +6,12 @@ pub use self::{config::Config, execution::TaskKind};
 use self::{execution::Task, features::FeatureMatrix};
 use cargo_metadata::{Metadata, MetadataCommand, Package};
 use derive_more::{
-  derive::{Display, Error},
   From,
+  derive::{Display, Error},
 };
 use figment::{
-  providers::{Format, Json},
   Figment,
+  providers::{Format, Json},
 };
 use std::path::PathBuf;
 

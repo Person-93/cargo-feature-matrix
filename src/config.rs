@@ -1,7 +1,7 @@
 use crate::features::{FeatureMatrix, FeatureSet};
 use figment::{
-  value::{Dict, Map},
   Error, Figment, Metadata, Profile, Provider,
+  value::{Dict, Map},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;

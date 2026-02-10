@@ -56,10 +56,10 @@ enum ColorChoice {
 
 fn main() -> Result<()> {
   let mut args = env::args().collect_vec();
-  if let Some(name) = args.get(1) {
-    if name == "feature-matrix" {
-      args.remove(1);
-    }
+  if let Some(name) = args.get(1)
+    && name == "feature-matrix"
+  {
+    args.remove(1);
   }
 
   let Opts {

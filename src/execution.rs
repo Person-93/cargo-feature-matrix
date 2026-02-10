@@ -1,4 +1,4 @@
-use crate::{features::FeatureMatrix, Error};
+use crate::{Error, features::FeatureMatrix};
 use lazy_static::lazy_static;
 use std::{
   env, ffi::OsString, io::Write, path::Path, process::Command, process::Stdio,
