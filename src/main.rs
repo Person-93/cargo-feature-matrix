@@ -9,7 +9,7 @@ use std::{env, io::IsTerminal, path::PathBuf};
 #[derive(Debug, Parser)]
 #[command(author, version, about, bin_name = "cargo feature-matrix")]
 struct Opts {
-  /// The cargo commands to run.
+  /// The cargo command to run.
   command: String,
 
   /// Arguments to pass to the cargo command

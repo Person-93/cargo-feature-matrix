@@ -11,6 +11,7 @@ of features. It also takes transitively enabled features into account. So if
 you have `feat-a` that enabled `feat-b`, it won't do two separate runs.
 
 ## Install
+
 ```shell
 cargo install cargo-feature-matrix
 ```
@@ -19,6 +20,7 @@ cargo install cargo-feature-matrix
 
 Any cargo command that accepts a `--package`, `--features`, and
 `--no-default-features` flag can be run with this command.
+
 ```shell
 cargo feature-matrix [OPTIONS] <COMMAND> [-- <COMMAND_ARGS_AND_FLAGS>...]
 ```
@@ -95,7 +97,7 @@ skip = [["a", "list"], ["of", "feature"], ["lists"]]
 
 # Some crates prepend internal features with a double underscore. If this
 # flag is not set, those features will not be used to build the matrix, but
-# will be allowed if they are enabled by other features. Defaults is false
+# will be allowed if they are enabled by other features. Default is false.
 include_hidden = true
 
 # List sets of features that can't be used together. Any generated feature
