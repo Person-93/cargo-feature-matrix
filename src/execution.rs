@@ -1,4 +1,5 @@
-use crate::{Error, features::FeatureMatrix};
+use crate::Error;
+use crate::features::{FeatureMatrix, FeatureSet};
 use lazy_static::lazy_static;
 use std::{
   env, ffi::OsString, io::Write, path::Path, process::Command, process::Stdio,
@@ -132,28 +133,39 @@ impl<'t> Task<'t> {
 
   fn print_jobs(self) {
     let prefix = format!(
-      "{} {} --package {} {}",
+      "{} {} {}",
       CARGO.to_string_lossy(),
       self.command,
-      self.package_name,
       self.args.join(" ")
     );
+    let mut stdout = std::io::stdout().lock();
     for feature_set in self.matrix {
-      if feature_set.is_empty() {
-        println!("{}", prefix);
-      } else {
-        println!("{} --features {}", prefix, feature_set);
-      }
+      write!(stdout, "{prefix}").unwrap();
+      write_package_and_features(&mut stdout, self.package_name, &feature_set);
+      writeln!(stdout).unwrap();
     }
   }
 
   fn print_matrix(self) {
+    let mut stdout = std::io::stdout().lock();
     for feature_set in self.matrix {
       if feature_set.is_empty() {
         continue;
       }
-      println!("{feature_set}");
+      write_package_and_features(&mut stdout, self.package_name, &feature_set);
+      writeln!(stdout).unwrap();
     }
+  }
+}
+
+fn write_package_and_features(
+  f: &mut impl Write,
+  package: &str,
+  feature_set: &FeatureSet,
+) {
+  write!(f, "--package {package}").unwrap();
+  if !feature_set.is_empty() {
+    write!(f, " --features = {feature_set}").unwrap();
   }
 }
 
