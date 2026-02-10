@@ -26,7 +26,7 @@ impl<'f> FeatureMatrix<'f> {
       .powerset()
       .map(FeatureSet::from_iter)
       .map(|mut set| {
-        set.extend(include.clone());
+        set.extend(include.iter().cloned());
         set.add_transitive_features(package);
         set
       })
@@ -98,7 +98,9 @@ impl<'f> FeatureSet<'f> {
         raw_features.get(feature.as_ref()).map(|transitives| {
           transitives
             .iter()
-            .filter(|transitive| !transitive.starts_with("dep:"))
+            .filter(|transitive| {
+              !transitive.starts_with("dep:") && !transitive.contains('/')
+            })
             .map(AsRef::as_ref)
         })
       })
