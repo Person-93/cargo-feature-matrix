@@ -25,6 +25,10 @@ struct Opts {
   #[arg(short, long, value_delimiter = ',')]
   deny: Vec<String>,
 
+  /// The command to run is not a cargo subcommand
+  #[arg(long)]
+  no_cargo: bool,
+
   /// Print a list of all the cargo commands one per line.
   ///
   /// This is intended to be consumed by external job runners.
@@ -67,6 +71,7 @@ fn main() -> Result<()> {
     color,
     args,
     deny,
+    no_cargo,
     print_jobs,
     print_matrix,
     dry_run,
@@ -99,6 +104,7 @@ fn main() -> Result<()> {
   config.deny = FeatureSet::from_iter(deny.into_iter().map(Feature::from));
 
   cargo_feature_matrix::run(
+    no_cargo,
     command.unwrap_or_default(),
     args,
     task,

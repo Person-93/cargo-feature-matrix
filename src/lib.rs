@@ -16,6 +16,7 @@ use figment::{
 use std::path::PathBuf;
 
 pub fn run(
+  no_cargo: bool,
   command: String,
   args: Vec<String>,
   task: TaskKind,
@@ -43,6 +44,7 @@ pub fn run(
 
     let matrix = FeatureMatrix::new(package, &config);
     let task = Task::new(
+      no_cargo,
       task,
       &command,
       manifest_path.as_deref(),

@@ -12,6 +12,7 @@ pub(crate) struct Task<'t> {
   package_name: &'t str,
   args: &'t [String],
   command: &'t str,
+  no_cargo: bool,
   kind: TaskKind,
 }
 
@@ -25,6 +26,7 @@ pub enum TaskKind {
 
 impl<'t> Task<'t> {
   pub(crate) fn new(
+    no_cargo: bool,
     kind: TaskKind,
     command: &'t str,
     manifest_path: Option<&'t Path>,
@@ -38,6 +40,7 @@ impl<'t> Task<'t> {
       package_name,
       args,
       command,
+      no_cargo,
       kind,
     }
   }
@@ -65,9 +68,14 @@ impl<'t> Task<'t> {
       let cmd = if dry_run {
         None
       } else {
-        let mut cmd = Command::new(CARGO.as_os_str());
+        let mut cmd = if !self.no_cargo {
+          let mut cmd = Command::new(CARGO.as_os_str());
+          cmd.arg(self.command);
+          cmd
+        } else {
+          Command::new(self.command)
+        };
         cmd
-          .arg(self.command)
           .args(self.args.iter())
           .stderr(Stdio::piped())
           .stdout(Stdio::piped())
