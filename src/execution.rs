@@ -165,7 +165,7 @@ fn write_package_and_features(
 ) {
   write!(f, "--package {package}").unwrap();
   if !feature_set.is_empty() {
-    write!(f, " --features = {feature_set}").unwrap();
+    write!(f, " --features={feature_set}").unwrap();
   }
 }
 
